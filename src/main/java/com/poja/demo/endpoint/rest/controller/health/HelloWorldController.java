@@ -1,7 +1,11 @@
 package com.poja.demo.endpoint.rest.controller.health;
 
-import com.poja.demo.service.HelloWorldService;
+import com.poja.demo.mail.Email;
+import com.poja.demo.mail.Mailer;
+import jakarta.mail.internet.InternetAddress;
+import java.util.List;
 import lombok.AllArgsConstructor;
+import lombok.SneakyThrows;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
@@ -9,10 +13,15 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 @AllArgsConstructor
 public class HelloWorldController {
-    private final HelloWorldService service;
+    private final Mailer mailer;
 
     @GetMapping("/hello")
-    public String helloWorld(@RequestParam String name) {
-        return service.uploadHelloWorldMessage(name);
+    @SneakyThrows
+    public String helloWorld(@RequestParam String to) {
+        var email =
+                new Email(new InternetAddress(to), List.of(), List.of(), "Hello world", "... world!", List.of());
+
+        mailer.accept(email);
+        return "... world!";
     }
 }
