@@ -1,8 +1,7 @@
 package com.poja.demo.endpoint.rest.controller.health;
 
-import com.poja.demo.mail.Email;
-import com.poja.demo.mail.Mailer;
-import jakarta.mail.internet.InternetAddress;
+import com.poja.demo.endpoint.event.EventProducer;
+import com.poja.demo.endpoint.event.model.SendEmailRequested;
 import java.util.List;
 import lombok.AllArgsConstructor;
 import lombok.SneakyThrows;
@@ -13,15 +12,13 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 @AllArgsConstructor
 public class HelloWorldController {
-    private final Mailer mailer;
+    private final EventProducer<SendEmailRequested> eventProducer;
 
     @GetMapping("/hello")
     @SneakyThrows
     public String helloWorld(@RequestParam String to) {
-        var email =
-                new Email(new InternetAddress(to), List.of(), List.of(), "Hello world", "... world!", List.of());
-
-        mailer.accept(email);
+        var event = SendEmailRequested.builder().to(to).build();
+        eventProducer.accept(List.of(event));
         return "... world!";
     }
 }
